@@ -41,7 +41,7 @@ func generateCode(m EnumTypeMap) string {
 		}
 		sorted_var_list.Sort()
 
-		code += nl(fmt.Sprintf("type %s struct { \n T %s `json:\"type\"` \n D interface{} `json:\"data\"` \n }",
+		code += nl(fmt.Sprintf("type %s struct { \n Type %s `json:\"type\"` \n Data interface{} `json:\"data\"` \n }",
 			enum_name,
 			enum_info.Constraint))
 		var unmarshal_code = func() *string {
@@ -60,7 +60,7 @@ func generateCode(m EnumTypeMap) string {
 						case_code += nl(fmt.Sprintf("	var d %s", enum_info.Variants[VariantType(var_name)]))
 						case_code += nl("	var data_err = json.Unmarshal(data_raw, &d)")
 						case_code += nl("       if data_err != nil { return data_err }")
-						case_code += nl("self.D = &d")
+						case_code += nl("self.Data = &d")
 					} else {
 						case_code += nl("break")
 					}
@@ -85,7 +85,7 @@ func generateCode(m EnumTypeMap) string {
 			v += nl(`switch t.Value().(type) {`)
 			v += nl(*case_code)
 			v += nl("}")
-			v += nl(`self.T = t`)
+			v += nl(`self.Type = t`)
 
 			v += nl(`return nil`)
 			return &v

@@ -32,6 +32,7 @@ func generateCode(m EnumTypeMap) string {
 	}
 	sorted_list.Sort()
 
+	var json_required bool
 	for _, enum_name := range sorted_list {
 		var enum_info = m[enum_name]
 
@@ -91,11 +92,22 @@ func generateCode(m EnumTypeMap) string {
 			return &v
 		}()
 		if unmarshal_code != nil {
+			json_required = true
 			code += nl(fmt.Sprintf("func (self *%s) UnmarshalJSON(b []byte) error {\n %s \n}\n", enum_name, *unmarshal_code))
 		}
 	}
 
-	return code
+	var imports string
+	if len(sorted_list) > 0 {
+		imports += nl(`import (`)
+		imports += nl(`"errors"`)
+		if json_required {
+			imports += nl(`"encoding/json"`)
+		}
+		imports += nl(`)`)
+	}
+
+	return imports + code
 }
 
 func main() {

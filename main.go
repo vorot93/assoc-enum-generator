@@ -79,7 +79,7 @@ func generateCode(m EnumTypeMap) string {
 			v += nl("if err := json.Unmarshal(b, &doc); err != nil { return err }")
 			v += nl("if doc == nil { return nil }")
 			v += nl(`var t_raw, t_found = doc["type"]; if !t_found { return nil }`)
-			v += nl(`var data_raw, data_found = doc["data"]; _ = data_found`)
+			v += nl(`var data_raw, data_found = doc["data"]; if bytes.Equal(data_raw, []byte("null")) { data_found = false }`)
 			v += nl(fmt.Sprintf(`var t %s`, enum_info.Constraint))
 			v += nl(`if t_err := json.Unmarshal(t_raw, &t); t_err != nil { return t_err }`)
 
@@ -102,6 +102,7 @@ func generateCode(m EnumTypeMap) string {
 		imports += nl(`import (`)
 		imports += nl(`"errors"`)
 		if json_required {
+			imports += nl(`"bytes"`)
 			imports += nl(`"encoding/json"`)
 		}
 		imports += nl(`)`)

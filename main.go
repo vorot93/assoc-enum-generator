@@ -54,7 +54,8 @@ func generateCode(m EnumTypeMap) string {
 				}
 				sorted_list.Sort()
 				for _, var_name := range sorted_list {
-					case_code += nl(fmt.Sprintf("case %s:", var_name))
+					var full_var_name = enum_info.Constraint + var_name
+					case_code += nl(fmt.Sprintf("case %s:", full_var_name))
 					var assoc_type = enum_info.Variants[VariantType(var_name)]
 					if assoc_type != "null" {
 						case_code += nl(fmt.Sprintf("if !data_found { return errors.New(\"No associated data found for enum %s\") }", enum_name))
@@ -83,7 +84,7 @@ func generateCode(m EnumTypeMap) string {
 			v += nl(fmt.Sprintf(`var t %s`, enum_info.Constraint))
 			v += nl(`if t_err := json.Unmarshal(t_raw, &t); t_err != nil { return t_err }`)
 
-			v += nl(`switch t.Value().(type) {`)
+			v += nl(`switch t {`)
 			v += nl(*case_code)
 			v += nl("}")
 			v += nl(`self.Type = t`)
